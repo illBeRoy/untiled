@@ -1,0 +1,21 @@
+@import '../../assets/styles/layouts.scss';
+
+.panes-container {
+  @include horizontally-space-children(10px);
+
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: start;
+  overflow: hidden;
+
+  .pane {
+    height: 100%;
+    box-sizing: border-box;
+    border: 10px solid;
+    border-image: url(~/assets/images/panel-border.svg) 8 round;
+    background-color: #749593;
+    background-clip: content-box;
+    overflow: scroll;
+  }
+}

@@ -4,15 +4,6 @@ import Jimp from 'jimp';
 export type Base64EncodedImage = string;
 export type TileId = number;
 
-export interface UseDocumentHook {
-  document: Document;
-  loadTiles(source: Base64EncodedImage): Promise<void>;
-  setTileOnMapInPosition(tileId: TileId, x: number, y: number): void;
-  getTileDataInPosition(x: number, y: number): Base64EncodedImage;
-  eraseTileFromMapInPosition(x: number, y: number);
-  undoLatestAction(): void;
-}
-
 export interface Document {
   tileSize: number;
   tileSet: TileSet;
@@ -36,6 +27,11 @@ export interface TileMapTiles {
 }
 
 export interface DocumentStoreOpts {
+  createEmptyDocument?: EmptyDocumentCreationSpecs;
+  fromDocument?: Document;
+}
+
+export interface EmptyDocumentCreationSpecs {
   tileSize: number;
   width: number;
   height: number;
@@ -46,13 +42,34 @@ export class DocumentStore {
   @observable private tileSize: number;
   @observable private tileMapWidth: number;
   @observable private tileMapHeight: number;
+  @observable private baseTilemapTiles: TileMapTiles;
   @observable private history: TileMapTiles[];
 
-  constructor({ tileSize, width, height }: DocumentStoreOpts) {
+  constructor({ createEmptyDocument, fromDocument }: DocumentStoreOpts) {
+    if (createEmptyDocument) {
+      this.initializeToEmptyDocument(createEmptyDocument);
+    } else if (fromDocument) {
+      this.initializeFromDocument(fromDocument);
+    } else {
+      throw new Error('Must specify source to create the document from');
+    }
+  }
+
+  private initializeToEmptyDocument({ tileSize, width, height }: EmptyDocumentCreationSpecs) {
     this.tileSize = tileSize;
     this.tileMapWidth = width;
     this.tileMapHeight = height;
     this.tileSet = { width: 0, height: 0, tiles: [] };
+    this.baseTilemapTiles = {};
+    this.history = [];
+  }
+
+  private initializeFromDocument({ tileSize, tileMap, tileSet }: Document) {
+    this.tileSize = tileSize;
+    this.tileMapWidth = tileMap.width;
+    this.tileMapHeight = tileMap.height;
+    this.tileSet = tileSet;
+    this.baseTilemapTiles = tileMap.tiles;
     this.history = [];
   }
 
@@ -64,7 +81,7 @@ export class DocumentStore {
       tileMap: {
         width: this.tileMapWidth,
         height: this.tileMapHeight,
-        tiles: Object.assign({}, ...this.history)
+        tiles: Object.assign({}, this.baseTilemapTiles, ...this.history)
       }
     };
   }
@@ -109,8 +126,13 @@ export class DocumentStore {
     this.history.push(groupOfTiles);
   }
 
-  getTileDataInPosition(x: number, y: number): Base64EncodedImage {
+  getTileIdInPosition(x: number, y: number): TileId {
     const tileId = this.document.tileMap.tiles[`${x},${y}`];
+    return tileId;
+  }
+
+  getTileDataInPosition(x: number, y: number): Base64EncodedImage {
+    const tileId = this.getTileIdInPosition(x, y);
     if (tileId) {
       return this.tileSet.tiles[tileId];
     }
@@ -124,6 +146,26 @@ export class DocumentStore {
   @action
   undoLatestAction() {
     this.history.pop();
+  }
+
+  async getBase64Png(): Promise<Base64EncodedImage> {
+    const destinationJimp = await Jimp.create(this.tileMapWidth * this.tileSize, this.tileMapHeight * this.tileSize, 'FFFFFF');
+    const tileJimps = await Promise.all(
+      this.tileSet.tiles.map(tileDataUri =>
+        Jimp.read(Buffer.from(tileDataUri.split('base64,')[1], 'base64'))
+      )
+    );
+
+    for (let x = 0; x < this.tileMapWidth; x += 1) {
+      for (let y = 0; y < this.tileMapHeight; y += 1) {
+        const tileId = this.getTileIdInPosition(x, y);
+        if (tileId) {
+          destinationJimp.composite(tileJimps[tileId], x * this.tileSize, y * this.tileSize);
+        }
+      }
+    }
+
+    return await destinationJimp.getBase64Async(Jimp.MIME_PNG);
   }
 }
 

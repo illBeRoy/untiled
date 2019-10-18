@@ -8,31 +8,48 @@
   width: 640px;
   height: 480px;
   padding: 20px;
-  background: #394f57;
+  background: #446668;
   box-sizing: border-box;
   overflow: hidden;
 
   .top-bar {
-    height: 50px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
     flex-grow: 0;
     flex-shrink: 0;
+    height: 50px;
+
+    .title {
+      user-select: none;
+      color: #ffffff;
+      font-size: 24px;
+      transform: translateY(-2px);
+    }
+
+    .top-bar-buttons {
+      @include horizontally-space-children(15px);
+      
+      .btn {
+        height: 32px;
+        width: 32px;
+        cursor: pointer;
+  
+        &:hover {
+          transform: translate3d(-2px, -2px, 0);
+          box-shadow: 2px 2px 0 rgba(0,0,0,.3);
+        }
+  
+        &:active {
+          transform: translate3d(0, 0, 0);
+          box-shadow: none;
+        }
+      }
+    }
   }
 
   .document-area {
-    @include horizontally-space-children(10px);
-
-    position: relative;
     flex-grow: 1;
-    justify-content: space-between;
-    overflow: hidden;
-
-    .panel {
-      box-sizing: border-box;
-      border: 10px solid;
-      border-image: url(~/assets/images/panel-border.svg) 8 round;
-      background-color: #749593;
-      background-clip: content-box;
-      overflow: scroll;
-    }
   }
 }

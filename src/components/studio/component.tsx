@@ -1,161 +1,91 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 import { saveAs } from 'file-saver';
-import { DocumentStore, aGroupOfTiles, TileId } from '../../stores/document';
-import { Grid } from '../grid/component';
+import { DocumentStore, aGroupOfTiles, TileId, EmptyDocumentCreationSpecs, Base64EncodedImage } from '../../stores/document';
 import tileSet from '../../tileset.fixture';
 import style from './style.scss';
+import { Editor } from '../editor/component';
 
-interface TileSelection {
-  tiles: TileId[];
-  width: number;
-  height: number;
+export interface StudioState {
+  flow: 'new' | 'loading' | 'editing';
 }
 
 @observer
-export class Studio extends React.Component {
-  private documentStore = new DocumentStore({ tileSize: 16, width: 10, height: 10 });
-  private tilesSelection: TileSelection = { tiles: [], width: 0, height: 0 };
+export class Studio extends React.Component<{}, StudioState> {
+  private documentStore: DocumentStore;
+  readonly state: StudioState = {
+    flow: 'new'
+  };
 
   componentDidMount() {
     window.addEventListener('keydown', this.onKeyDown);
-    this.documentStore.loadTiles(tileSet);
+    this.createNewDocument({ width: 10, height: 10, tileSize: 16 }, tileSet);
   }
 
   componentWillUnmount() {
     window.removeEventListener('keydown', this.onKeyDown);
   }
 
+  createNewDocument = async (creationSpecs: EmptyDocumentCreationSpecs, tileSet: Base64EncodedImage) => {
+    this.setState({ flow: 'loading' });
+    this.documentStore = new DocumentStore({ createEmptyDocument: creationSpecs });
+    await this.documentStore.loadTiles(tileSet);
+    this.setState({  flow: 'editing' });
+  }
+
   private onKeyDown = (e: KeyboardEvent) => {
-    const itsCmdZ = e.metaKey && e.key === 'z';
+    const isMac = window.navigator.platform.match('Mac');
+    const cmdHeld = isMac ? e.metaKey : e.ctrlKey;
+    const itsCmdZ = cmdHeld && e.key === 'z';
+    const itsCmdS = cmdHeld && e.key === 's';
+
     if (itsCmdZ) {
       this.documentStore.undoLatestAction();
-    }
-  }
-
-  private onSelectingTilesFromTileset = (originX: number, originY: number, width: number, height: number) => {
-    this.tilesSelection = { tiles: [], width, height };
-    for (let y = originY; y < originY + height; y += 1) {
-      for (let x = originX; x < originX + width; x += 1) {
-        const tileId = y * this.documentStore.document.tileSet.width + x;
-        this.tilesSelection.tiles.push(tileId);
-      }
-    }
-  }
-
-  private onDrawingTilesOnTileMap = (originX: number, originY: number, width: number, height: number) => {
-    if (this.tilesSelection.tiles.length === 0) {
-      return;
-    }
-
-    const repeatSamePatternDrawingStrategy = () => {
-      const groupOfTiles = aGroupOfTiles();
-
-      for (let x = originX; x < originX + width; x += 1) {
-        for (let y = originY; y < originY + height; y += 1) {
-          const tileId = this.tilesSelection.tiles[
-            ((y - originY) % this.tilesSelection.height) * this.tilesSelection.width +
-            ((x - originX) % this.tilesSelection.width)
-          ];
-
-          groupOfTiles.withTileInPosition(tileId, x, y);
-        }
-      }
-
-      return groupOfTiles.build();
-    };
-
-    const areaWithFrameStrategy = () => {
-      const groupOfTiles = aGroupOfTiles();
-
-      for (let x = originX; x < originX + width; x += 1) {
-        for (let y = originY; y < originY + height; y += 1) {
-          const topLeftTile = this.tilesSelection.tiles[0];
-          const topTile = this.tilesSelection.tiles[1];
-          const topRightTile = this.tilesSelection.tiles[2];
-          const leftTile = this.tilesSelection.tiles[3];
-          const centerTile = this.tilesSelection.tiles[4];
-          const rightTile = this.tilesSelection.tiles[5];
-          const bottomLeftTile = this.tilesSelection.tiles[6];
-          const bottomTile = this.tilesSelection.tiles[7];
-          const bottomRightTile = this.tilesSelection.tiles[8];
-
-          let tileId: TileId;
-          if (x === originX) {
-            if (y === originY) {
-              tileId = topLeftTile;
-            } else if (y === originY + height - 1) {
-              tileId = bottomLeftTile;
-            } else {
-              tileId = leftTile;
-            }
-          } else if (x === originX + width - 1) {
-            if (y === originY) {
-              tileId = topRightTile;
-            } else if (y === originY + height - 1) {
-              tileId = bottomRightTile;
-            } else {
-              tileId = rightTile;
-            }
-          } else {
-            if (y === originY) {
-              tileId = topTile;
-            } else if (y === originY + height - 1) {
-              tileId = bottomTile;
-            } else {
-              tileId = centerTile;
-            }
-          }
-
-          groupOfTiles.withTileInPosition(tileId, x, y);
-        }
-      }
-
-      return groupOfTiles.build();
-    };
-
-    const selectionIs3x3Square =
-      this.tilesSelection.width === 3 &&
-      this.tilesSelection.height === 3;
-
-    if (selectionIs3x3Square) {
-      const groupOfTiles = areaWithFrameStrategy();
-      this.documentStore.setGroupOfTilesOnMapInPosition(groupOfTiles);
-    } else {
-      const groupOfTiles = repeatSamePatternDrawingStrategy();
-      this.documentStore.setGroupOfTilesOnMapInPosition(groupOfTiles);
+    } else if (itsCmdS) {
+      e.preventDefault();
+      this.saveToDisk();
     }
   }
 
   private saveToDisk = () => {
-    saveAs(new Blob([JSON.stringify(this.documentStore.document)]), 'map.untiled');
+    const fileOutput = new Blob([JSON.stringify(this.documentStore.document)]);
+    saveAs(fileOutput, 'map.untiled');
+  }
+
+  private exportToPng = async () => {
+    const png = await this.documentStore.getBase64Png();
+    const pngMime = 'image/png';
+    const pngByteString = atob(png.split('base64,')[1]);
+
+    const pngArrayBuffer = new ArrayBuffer(pngByteString.length);
+    const pngUInt8Array = new Uint8Array(pngArrayBuffer);
+    pngByteString.split('').forEach((char, i) => pngUInt8Array[i] = char.charCodeAt(0));
+
+    const fileOutput = new Blob([pngArrayBuffer], { type: pngMime });
+    saveAs(fileOutput, 'image.png');
   }
 
   render() {
-    const getImageForCellInMapDisplay = this.documentStore.getTileDataInPosition.bind(this.documentStore);
-
+    const { flow } = this.state;
     return (
       <div className={style.window}>
-        <div className={style.topBar} />
-        <div className={style.documentArea}>
-          <div className={style.panel} style={{ position: 'absolute', left: 0, top: 0, height: '100%', width: '60%' }}>
-            <Grid width={10} height={10} tileSize={16} scale={2} getImageForCell={getImageForCellInMapDisplay} onSelection={this.onDrawingTilesOnTileMap} />
+        <div className={style.topBar}>
+          <span className={style.title}>untiled</span>
+          <div className={style.topBarButtons}>
+            <img className={style.btn} src={require('../../assets/images/new-btn.png')} />
+            <img className={style.btn} src={require('../../assets/images/open-btn.png')} />
+            <img className={style.btn} src={require('../../assets/images/save-btn.png')} onClick={this.saveToDisk} />
+            <img className={style.btn} src={require('../../assets/images/export-btn.png')} onClick={this.exportToPng}/>
           </div>
-          {
-            this.documentStore.document.tileSet.width > 0 &&
-            <div className={style.panel} style={{ position: 'absolute', right: 0, top: 0, height: '100%', width: '40%' }}>
-              <Grid
-                width={this.documentStore.document.tileSet.width}
-                height={this.documentStore.document.tileSet.height}
-                tileSize={16}
-                scale={1}
-                getImageForCell={(x, y) => this.documentStore.document.tileSet.tiles[y * this.documentStore.document.tileSet.width + x]}
-                multipleSelection='alwaysKeep'
-                onSelection={this.onSelectingTilesFromTileset}
-              />
-            </div>
-          }
         </div>
+        {
+          flow === 'loading' &&
+            <span>Loading...</span>
+        }
+        {
+          flow === 'editing' &&
+            <Editor documentStore={this.documentStore} />
+        }
       </div>
     );
   }

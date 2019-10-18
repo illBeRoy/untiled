@@ -1,5 +1,26 @@
 .grid-container {
-  $border: 1px solid black;
+  @mixin with-borders($top: false, $right: false, $bottom: false, $left: false) {
+    $border: 2px solid;
+    border-image: url(~/assets/images/grid-border.svg) 2;
+
+    @if $top {
+      border-top: $border;
+    }
+
+    @if $right {
+      border-right: $border;
+    }
+
+    @if $bottom {
+      border-bottom: $border;
+    }
+
+    @if $left {
+      border-left: $border;
+    }
+  }
+
+  @include with-borders($top: true, $left: true);
   $selected-border: 1px solid red;
 
   display: flex;
@@ -7,15 +28,12 @@
   flex-wrap: wrap;
   flex-grow: 0;
   flex-shrink: 0;
-  border-top: $border;
-  border-left: $border;
   user-select: none;
 
   .cell {
+    @include with-borders($right: true, $bottom: true);
     position: relative;
     box-sizing: border-box;
-    border-right: $border;
-    border-bottom: $border;
 
     > .content-image {
       position: absolute;
