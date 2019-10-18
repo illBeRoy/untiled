@@ -1,0 +1,8 @@
+@import '../../assets/styles/layouts.scss';
+
+.upload-button {
+  @include fill-parent();
+
+  z-index: 10;
+  opacity: 0;
+}

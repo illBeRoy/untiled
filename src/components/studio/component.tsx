@@ -1,10 +1,11 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 import { saveAs } from 'file-saver';
-import { DocumentStore, aGroupOfTiles, TileId, EmptyDocumentCreationSpecs, Base64EncodedImage } from '../../stores/document';
+import { DocumentStore, EmptyDocumentCreationSpecs, Base64EncodedImage, Document } from '../../stores/document';
 import tileSet from '../../tileset.fixture';
 import style from './style.scss';
 import { Editor } from '../editor/component';
+import { UploadButton } from '../upload-button/component';
 
 export interface StudioState {
   flow: 'new' | 'loading' | 'editing';
@@ -26,13 +27,6 @@ export class Studio extends React.Component<{}, StudioState> {
     window.removeEventListener('keydown', this.onKeyDown);
   }
 
-  createNewDocument = async (creationSpecs: EmptyDocumentCreationSpecs, tileSet: Base64EncodedImage) => {
-    this.setState({ flow: 'loading' });
-    this.documentStore = new DocumentStore({ createEmptyDocument: creationSpecs });
-    await this.documentStore.loadTiles(tileSet);
-    this.setState({  flow: 'editing' });
-  }
-
   private onKeyDown = (e: KeyboardEvent) => {
     const isMac = window.navigator.platform.match('Mac');
     const cmdHeld = isMac ? e.metaKey : e.ctrlKey;
@@ -45,6 +39,19 @@ export class Studio extends React.Component<{}, StudioState> {
       e.preventDefault();
       this.saveToDisk();
     }
+  }
+
+  private createNewDocument = async (creationSpecs: EmptyDocumentCreationSpecs, tileSet: Base64EncodedImage) => {
+    this.setState({ flow: 'loading' });
+    this.documentStore = new DocumentStore({ createEmptyDocument: creationSpecs });
+    await this.documentStore.loadTiles(tileSet);
+    this.setState({  flow: 'editing' });
+  }
+
+  private openDocument = (document: Document) => {
+    this.setState({ flow: 'loading' });
+    this.documentStore = new DocumentStore({ fromDocument: document });
+    this.setState({ flow: 'editing' });
   }
 
   private saveToDisk = () => {
@@ -73,7 +80,10 @@ export class Studio extends React.Component<{}, StudioState> {
           <span className={style.title}>untiled</span>
           <div className={style.topBarButtons}>
             <img className={style.btn} src={require('../../assets/images/new-btn.png')} />
-            <img className={style.btn} src={require('../../assets/images/open-btn.png')} />
+            <div className={style.btn}>
+              <img className={style.btnBg} src={require('../../assets/images/open-btn.png')} />
+              <UploadButton readAs='plain-text' accept={['.untiled']} onFileRead={e => this.openDocument(JSON.parse(e.contents))} />
+            </div>
             <img className={style.btn} src={require('../../assets/images/save-btn.png')} onClick={this.saveToDisk} />
             <img className={style.btn} src={require('../../assets/images/export-btn.png')} onClick={this.exportToPng}/>
           </div>
