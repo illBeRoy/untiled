@@ -1,0 +1,38 @@
+@import '../../assets/styles/layouts.scss';
+
+.window {
+  @include vertically-space-children(10px);
+
+  display: flex;
+  flex-direction: column;
+  width: 640px;
+  height: 480px;
+  padding: 20px;
+  background: #394f57;
+  box-sizing: border-box;
+  overflow: hidden;
+
+  .top-bar {
+    height: 50px;
+    flex-grow: 0;
+    flex-shrink: 0;
+  }
+
+  .document-area {
+    @include horizontally-space-children(10px);
+
+    position: relative;
+    flex-grow: 1;
+    justify-content: space-between;
+    overflow: hidden;
+
+    .panel {
+      box-sizing: border-box;
+      border: 10px solid;
+      border-image: url(~/assets/images/panel-border.svg) 8 round;
+      background-color: #749593;
+      background-clip: content-box;
+      overflow: scroll;
+    }
+  }
+}

@@ -1,0 +1,8 @@
+@font-face {
+  font-family: iFlash;
+  src: url("~/assets/fonts/iflash-705.woff");
+}
+
+@mixin main-font {
+  font-family: iFlash;
+}

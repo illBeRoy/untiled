@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="57px" height="57px" viewBox="0 0 57 57" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 57.1 (83088) - https://sketch.com -->
+    <title>Group</title>
+    <desc>Created with Sketch.</desc>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Artboard" transform="translate(-76.000000, -267.000000)">
+            <g id="Group" transform="translate(77.000000, 268.000000)">
+                <rect id="Rectangle" fill="#749593" x="3" y="3" width="49" height="49"></rect>
+                <path d="M6,5 L6,6 L5,6 L5,49 L6,49 L6,50 L49,50 L49,49 L50,49 L50,6 L49,6 L49,5 L6,5 Z M6,1 L49,1 L49,0 L55,0 L55,6 L54,6 L54,49 L55,49 L55,55 L49,55 L49,54 L6,54 L6,55 L0,55 L0,49 L1,49 L1,6 L0,6 L0,0 L6,0 L6,1 Z" id="Rectangle-2" stroke="#000000" fill="#FFFFFF"></path>
+                <rect id="Rectangle" fill="#000000" x="1" y="1" width="4" height="4"></rect>
+                <rect id="Rectangle" fill="#000000" x="50" y="1" width="4" height="4"></rect>
+                <rect id="Rectangle" fill="#000000" x="50" y="50" width="4" height="4"></rect>
+                <rect id="Rectangle" fill="#000000" x="1" y="50" width="4" height="4"></rect>
+            </g>
+        </g>
+    </g>
+</svg>

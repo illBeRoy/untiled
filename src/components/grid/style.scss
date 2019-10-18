@@ -5,6 +5,8 @@
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
+  flex-grow: 0;
+  flex-shrink: 0;
   border-top: $border;
   border-left: $border;
   user-select: none;

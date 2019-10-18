@@ -1,0 +1,11 @@
+@mixin vertically-space-children($distance) {
+  > *:not(:last-child) {
+    margin-bottom: $distance;
+  }
+}
+
+@mixin horizontally-space-children($distance) {
+  > *:not(:last-child) {
+    margin-right: $distance;
+  }
+}
