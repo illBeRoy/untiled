@@ -1,7 +1,7 @@
 {
   "name": "untiled",
   "version": "1.0.0",
-  "description": "",
+  "description": "super easy tilemap editor",
   "main": "dist/index.html",
   "directories": {
     "test": "test"
@@ -9,17 +9,15 @@
   "scripts": {
     "test": "jest",
     "start": "parcel src/index.html",
-    "build:typescript": "tsc",
+    "start:nwjs": "parcel build src/index.html --out-dir dist --target node --no-source-maps --public-url ./ && run .",
     "build:target:web": "TARGET=web parcel build src/index.html --out-dir dist",
     "build:target:desktop": "TARGET=desktop parcel build src/index.html --out-dir dist --target node --no-source-maps --public-url ./ && build --tasks mac-x64 . && cp src/assets/files/** bin/untiled-1.0.0-mac-x64",
-    "watch:typescript": "tsc -w",
-    "watch": "npm run watch:typescript",
     "lint": "tslint --project tsconfig.json",
     "posttest": "npm run lint"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "private": true,
+  "author": "Roy Sommer",
+  "license": "MIT",
   "devDependencies": {
     "@types/file-saver": "^2.0.1",
     "@types/jest": "^24.0.18",
