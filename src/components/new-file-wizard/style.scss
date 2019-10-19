@@ -1,0 +1,98 @@
+@import '../../assets/styles/typography.scss';
+@import '../../assets/styles/layouts.scss';
+
+.form-container {
+  flex-grow: 1;
+
+  .form {
+    @include fill-parent();
+    
+    display: flex;
+    flex-direction: row;
+    padding: 15px;
+    box-sizing: border-box;
+
+    @mixin column($width) {
+      height: 100%;
+      width: $width;
+    }
+
+    .props-column {
+      @include column(60%);
+      position: relative;
+      overflow: scroll;
+
+      .props-content {
+        @include vertically-space-children(30px);
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 20px;
+        box-sizing: border-box;
+
+        .title {
+          font-size: 24px;
+        }
+  
+        .input-group {
+          @include vertically-space-children(5px);
+  
+          display: flex;
+          flex-direction: column;
+  
+          input {
+            @include main-font();
+            appearance: none;
+            border: 2px solid;
+            padding-left: 5px;
+            width: 40px;
+            user-select: all;
+          }
+  
+          .input-description {
+            font-size: 12px;
+            max-width: 300px;
+            word-wrap: normal;
+          }
+        }
+  
+        .form-button {
+          position: relative;
+          display: inline-block;
+          border: 2px solid black;
+          padding: 2px 5px;
+          background: white;
+          user-select: none;
+          cursor: pointer;
+
+          &:hover {
+            transform: translate3d(-2px, -2px, 0);
+            box-shadow: 2px 2px 0 rgba(0,0,0,.3);
+          }
+    
+          &:active {
+            transform: translate3d(0, 0, 0);
+            box-shadow: none;
+          }
+
+          &.inactive {
+            background: #aaaaaa;
+            cursor: default;
+            transform: translate3d(0, 0, 0);
+            box-shadow: none;
+          }
+  
+          * {
+            cursor: pointer;
+          }
+        }
+      }
+    }
+
+    .preview-column {
+      @include column(40%);
+      @include center-content();
+      overflow: scroll;
+    }
+  }
+}

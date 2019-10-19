@@ -118,22 +118,23 @@ export class Editor extends React.Component<EditorProps> {
 
   render() {
     const { documentStore } = this.props;
+    const { document } = documentStore;
     const getImageForCellInMapDisplay = documentStore.getTileDataInPosition.bind(documentStore);
 
     return (
       <PanesContainer className={style.documentArea} initialDistribution={[.6, .4]}>
         <Pane>
-          <Grid width={10} height={10} tileSize={16} scale={2} getImageForCell={getImageForCellInMapDisplay} onSelection={this.onDrawingTilesOnTileMap} />
+          <Grid width={document.tileMap.width} height={document.tileMap.height} tileSize={document.tileSize} scale={2} getImageForCell={getImageForCellInMapDisplay} onSelection={this.onDrawingTilesOnTileMap} />
         </Pane>
         <Pane>
           {
-            documentStore.document.tileSet.width > 0 &&
+            document.tileSet.width > 0 &&
               <Grid
-                width={documentStore.document.tileSet.width}
-                height={documentStore.document.tileSet.height}
+                width={document.tileSet.width}
+                height={document.tileSet.height}
                 tileSize={16}
                 scale={1}
-                getImageForCell={(x, y) => documentStore.document.tileSet.tiles[y * documentStore.document.tileSet.width + x]}
+                getImageForCell={(x, y) => document.tileSet.tiles[y * document.tileSet.width + x]}
                 multipleSelection='alwaysKeep'
                 onSelection={this.onSelectingTilesFromTileset}
               />

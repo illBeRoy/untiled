@@ -21,6 +21,7 @@
     "max-classes-per-file": false,
     "interface-name": false,
     "no-string-literal": false,
-    "member-ordering": false
+    "member-ordering": false,
+    "radix": false
   }
 }

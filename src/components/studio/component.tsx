@@ -6,9 +6,10 @@ import tileSet from '../../tileset.fixture';
 import style from './style.scss';
 import { Editor } from '../editor/component';
 import { UploadButton } from '../upload-button/component';
+import { NewFileWizard } from '../new-file-wizard/component';
 
 export interface StudioState {
-  flow: 'new' | 'loading' | 'editing';
+  flow: 'empty' | 'new' | 'loading' | 'editing';
 }
 
 @observer
@@ -20,7 +21,6 @@ export class Studio extends React.Component<{}, StudioState> {
 
   componentDidMount() {
     window.addEventListener('keydown', this.onKeyDown);
-    this.createNewDocument({ width: 10, height: 10, tileSize: 16 }, tileSet);
   }
 
   componentWillUnmount() {
@@ -41,11 +41,13 @@ export class Studio extends React.Component<{}, StudioState> {
     }
   }
 
-  private createNewDocument = async (creationSpecs: EmptyDocumentCreationSpecs, tileSet: Base64EncodedImage) => {
-    this.setState({ flow: 'loading' });
-    this.documentStore = new DocumentStore({ createEmptyDocument: creationSpecs });
-    await this.documentStore.loadTiles(tileSet);
-    this.setState({  flow: 'editing' });
+  private showNewFileWizard = () => {
+    this.setState({ flow: 'new' });
+  }
+
+  private onCreatingDocument = (documentStore: DocumentStore) => {
+    this.documentStore = documentStore;
+    this.setState({ flow: 'editing' });
   }
 
   private openDocument = (document: Document) => {
@@ -79,7 +81,7 @@ export class Studio extends React.Component<{}, StudioState> {
         <div className={style.topBar}>
           <span className={style.title}>untiled</span>
           <div className={style.topBarButtons}>
-            <img className={style.btn} src={require('../../assets/images/new-btn.png')} />
+            <img className={style.btn} src={require('../../assets/images/new-btn.png')} onClick={this.showNewFileWizard} />
             <div className={style.btn}>
               <img className={style.btnBg} src={require('../../assets/images/open-btn.png')} />
               <UploadButton readAs='plain-text' accept={['.untiled']} onFileRead={e => this.openDocument(JSON.parse(e.contents))} />
@@ -88,6 +90,10 @@ export class Studio extends React.Component<{}, StudioState> {
             <img className={style.btn} src={require('../../assets/images/export-btn.png')} onClick={this.exportToPng}/>
           </div>
         </div>
+        {
+          flow === 'new' &&
+            <NewFileWizard onCreatingNewFile={this.onCreatingDocument} />
+        }
         {
           flow === 'loading' &&
             <span>Loading...</span>
