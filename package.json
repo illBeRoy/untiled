@@ -2,7 +2,7 @@
   "name": "untiled",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/src/index.js",
+  "main": "dist/index.html",
   "directories": {
     "test": "test"
   },
@@ -10,7 +10,8 @@
     "test": "jest",
     "start": "parcel src/index.html",
     "build:typescript": "tsc",
-    "build": "parcel build src/index.html --out-dir dist",
+    "build:target:web": "TARGET=web parcel build src/index.html --out-dir dist",
+    "build:target:desktop": "TARGET=desktop parcel build src/index.html --out-dir dist --target node --no-source-maps --public-url ./ && build --tasks mac-x64 . && cp src/assets/files/** bin/untiled-1.0.0-mac-x64",
     "watch:typescript": "tsc -w",
     "watch": "npm run watch:typescript",
     "lint": "tslint --project tsconfig.json",
@@ -27,6 +28,7 @@
     "@types/react-dom": "^16.9.1",
     "jest": "^24.9.0",
     "node-sass": "^4.12.0",
+    "nwjs-builder-phoenix": "^1.15.0",
     "parcel-bundler": "^1.12.4",
     "postcss-modules": "^1.4.1",
     "ts-jest": "^24.1.0",
@@ -59,5 +61,20 @@
     "mobx-react": "^6.1.4",
     "react": "^16.10.2",
     "react-dom": "^16.10.2"
+  },
+  "window": {
+    "width": 1024,
+    "height": 768
+  },
+  "build": {
+    "output": "./bin",
+    "nwVersion": "0.41.3",
+    "files": [
+      "dist/**/*",
+      "attributions.txt"
+    ],
+    "mac": {
+      "icon": "src/assets/icons/map.icns"
+    }
   }
 }

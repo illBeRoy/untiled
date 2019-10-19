@@ -114,7 +114,7 @@ export class NewFileWizard extends React.Component<NewFileWizardProps, NewFileWi
                   </span>
                 </div>
                 <div className={style.formButton}>
-                  Upload Tileset Image
+                  Select Tileset Image
                   <UploadButton accept={[Jimp.MIME_JPEG, Jimp.MIME_PNG]} readAs='data-uri' onFileRead={this.onSelectTilesetImage} />
                 </div>
                 <div

@@ -198,6 +198,7 @@ fabric.properties
 
 dist
 build
+bin
 .cache
 .vscode
 .idea
