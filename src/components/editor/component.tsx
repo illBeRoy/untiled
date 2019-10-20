@@ -9,6 +9,11 @@ interface EditorProps {
   documentStore: DocumentStore;
 }
 
+interface EditorState {
+  mapPaneZoom: number;
+  tilesetPaneZoom: number;
+}
+
 interface TileSelection {
   tiles: TileId[];
   width: number;
@@ -16,8 +21,12 @@ interface TileSelection {
 }
 
 @observer
-export class Editor extends React.Component<EditorProps> {
+export class Editor extends React.Component<EditorProps, EditorState> {
   private tilesSelection: TileSelection = { tiles: [], width: 0, height: 0 };
+  readonly state: EditorState = {
+    mapPaneZoom: 2,
+    tilesetPaneZoom: 1
+  };
 
   private onSelectingTilesFromTileset = (originX: number, originY: number, width: number, height: number) => {
     const { documentStore } = this.props;
@@ -117,6 +126,7 @@ export class Editor extends React.Component<EditorProps> {
   }
 
   render() {
+    const { mapPaneZoom, tilesetPaneZoom } = this.state;
     const { documentStore } = this.props;
     const { document } = documentStore;
     const getImageForCellInMapDisplay = documentStore.getTileDataInPosition.bind(documentStore);
@@ -124,21 +134,25 @@ export class Editor extends React.Component<EditorProps> {
     return (
       <PanesContainer className={style.documentArea} initialDistribution={[.6, .4]}>
         <Pane>
-          <Grid width={document.tileMap.width} height={document.tileMap.height} tileSize={document.tileSize} scale={2} getImageForCell={getImageForCellInMapDisplay} onSelection={this.onDrawingTilesOnTileMap} />
+          <Grid
+            width={document.tileMap.width}
+            height={document.tileMap.height}
+            tileSize={document.tileSize}
+            scale={mapPaneZoom}
+            getImageForCell={getImageForCellInMapDisplay}
+            onSelection={this.onDrawingTilesOnTileMap}
+          />
         </Pane>
         <Pane>
-          {
-            document.tileSet.width > 0 &&
-              <Grid
-                width={document.tileSet.width}
-                height={document.tileSet.height}
-                tileSize={16}
-                scale={1}
-                getImageForCell={(x, y) => document.tileSet.tiles[y * document.tileSet.width + x]}
-                multipleSelection='alwaysKeep'
-                onSelection={this.onSelectingTilesFromTileset}
-              />
-          }
+          <Grid
+            width={document.tileSet.width}
+            height={document.tileSet.height}
+            tileSize={document.tileSize}
+            scale={tilesetPaneZoom}
+            getImageForCell={(x, y) => document.tileSet.tiles[y * document.tileSet.width + x]}
+            multipleSelection='alwaysKeep'
+            onSelection={this.onSelectingTilesFromTileset}
+          />
         </Pane>
       </PanesContainer>
     );
