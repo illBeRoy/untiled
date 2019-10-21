@@ -1,7 +1,7 @@
 {
   "name": "untiled",
   "version": "1.0.0-alpha3",
-  "description": "super easy tilemap editor",
+  "description": "super simple tilemap editor",
   "main": "dist/index.html",
   "directories": {
     "test": "test"

@@ -1,5 +1,5 @@
 # untiled
-> super easy tilemap editor
+> super simple tilemap editor
 
 ![image](https://user-images.githubusercontent.com/6681893/67148571-7ce09a80-f2a9-11e9-98e8-c5e938cf73ee.png)
 
