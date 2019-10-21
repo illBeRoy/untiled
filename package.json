@@ -1,6 +1,6 @@
 {
   "name": "untiled",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha3",
   "description": "super easy tilemap editor",
   "main": "dist/index.html",
   "directories": {
