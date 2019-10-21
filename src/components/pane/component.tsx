@@ -49,16 +49,44 @@ export interface PaneProps {
   children: any;
 }
 
-export const Pane = ({ children }: PaneProps) => {
+export interface PaneFixedOverlayProps {
+  children: any;
+}
+
+type PaneComponent = React.ComponentType<PaneProps> & { FixedOverlay: React.ComponentType<PaneFixedOverlayProps> };
+
+export const Pane: PaneComponent = (({ children }: PaneProps) => {
   const paneSettings = useContext(PaneSettingsContext);
 
   if (!paneSettings) {
     throw new Error('Pane must be a child of PanesContainer');
   }
 
+  const paneChildren = React.Children
+    .toArray(children)
+    .filter(child => child.type !== Pane.FixedOverlay);
+
+  const paneFixedOverlayChildren = React.Children
+    .toArray(children)
+    .filter(child => child.type === Pane.FixedOverlay);
+
   return (
-    <div className={style.pane} style={{ width: `${paneSettings.width * 100}%` }}>
-      { children }
-    </div>
+    <PaneSettingsContext.Provider value={null}>
+      <div className={style.pane} style={{ width: `${paneSettings.width * 100}%` }}>
+        <div className={style.paneScrollableArea}>
+          { paneChildren }
+        </div>
+        {
+          paneFixedOverlayChildren.length > 0 &&
+            <div className={style.paneOverlay}>
+              { paneFixedOverlayChildren }
+            </div>
+        }
+      </div>
+    </PaneSettingsContext.Provider >
   );
+}) as any;
+
+Pane.FixedOverlay = ({ children }: PaneFixedOverlayProps) => {
+  return children;
 };

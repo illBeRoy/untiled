@@ -10,12 +10,28 @@
   overflow: hidden;
 
   .pane {
+    position: relative;
     height: 100%;
     box-sizing: border-box;
     border: 10px solid;
     border-image: url(~/assets/images/panel-border.svg) 8 round;
     background-color: #749593;
     background-clip: content-box;
-    overflow: scroll;
+    overflow: hidden;
+
+    .pane-scrollable-area {
+      @include fill-parent();
+      overflow: scroll;
+    }
+
+    .pane-overlay {
+      @include fill-parent();
+
+      pointer-events: none;
+
+      * {
+        pointer-events: all;
+      }
+    }
   }
 }

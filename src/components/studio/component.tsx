@@ -15,6 +15,7 @@ export interface StudioState {
 @observer
 export class Studio extends React.Component<{}, StudioState> {
   private documentStore: DocumentStore;
+  private openButtonRef = React.createRef<UploadButton>();
   readonly state: StudioState = {
     flow: 'new'
   };
@@ -31,10 +32,14 @@ export class Studio extends React.Component<{}, StudioState> {
     const isMac = window.navigator.platform.match('Mac');
     const cmdHeld = isMac ? e.metaKey : e.ctrlKey;
     const itsCmdZ = cmdHeld && e.key === 'z';
+    const itsCmdO = cmdHeld && e.key === 'o';
     const itsCmdS = cmdHeld && e.key === 's';
 
     if (itsCmdZ) {
       this.documentStore.undoLatestAction();
+    } else if (itsCmdO) {
+      e.preventDefault();
+      this.openButtonRef.current.openFileDialog();
     } else if (itsCmdS) {
       e.preventDefault();
       this.saveToDisk();
@@ -84,7 +89,7 @@ export class Studio extends React.Component<{}, StudioState> {
             <img className={style.btn} src={require('../../assets/images/new-btn.png')} onClick={this.showNewFileWizard} />
             <div className={style.btn}>
               <img className={style.btnBg} src={require('../../assets/images/open-btn.png')} />
-              <UploadButton readAs='plain-text' accept={['.untiled']} onFileRead={e => this.openDocument(JSON.parse(e.contents))} />
+              <UploadButton ref={this.openButtonRef} readAs='plain-text' accept={['.untiled']} onFileRead={e => this.openDocument(JSON.parse(e.contents))} />
             </div>
             <img className={style.btn} src={require('../../assets/images/save-btn.png')} onClick={this.saveToDisk} />
             <img className={style.btn} src={require('../../assets/images/export-btn.png')} onClick={this.exportToPng}/>

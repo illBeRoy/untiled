@@ -125,6 +125,38 @@ export class Editor extends React.Component<EditorProps, EditorState> {
     }
   }
 
+  private setMapPaneZoom(zoom: number) {
+    this.setState({ mapPaneZoom: zoom });
+  }
+
+  private onZoomInMapPane = () => {
+    const { mapPaneZoom } = this.state;
+    this.setMapPaneZoom(mapPaneZoom + 1);
+  }
+
+  private onZoomOutMapPane = () => {
+    const { mapPaneZoom } = this.state;
+    if (mapPaneZoom > 1) {
+      this.setMapPaneZoom(mapPaneZoom - 1);
+    }
+  }
+
+  private setTilesetPaneZoom(zoom: number) {
+    this.setState({ tilesetPaneZoom: zoom });
+  }
+
+  private onZoomInTilesetPane = () => {
+    const { tilesetPaneZoom } = this.state;
+    this.setTilesetPaneZoom(tilesetPaneZoom + 1);
+  }
+
+  private onZoomOutTilesetPane = () => {
+    const { tilesetPaneZoom } = this.state;
+    if (tilesetPaneZoom > 1) {
+      this.setTilesetPaneZoom(tilesetPaneZoom - 1);
+    }
+  }
+
   render() {
     const { mapPaneZoom, tilesetPaneZoom } = this.state;
     const { documentStore } = this.props;
@@ -142,6 +174,13 @@ export class Editor extends React.Component<EditorProps, EditorState> {
             getImageForCell={getImageForCellInMapDisplay}
             onSelection={this.onDrawingTilesOnTileMap}
           />
+          <Pane.FixedOverlay>
+            <div className={style.zoomPanel}>
+              <img onClick={this.onZoomOutMapPane} src={require('../../assets/images/zoom-out.png')} />
+              <img src={require('../../assets/images/zoom-glass.png')} />
+              <img onClick={this.onZoomInMapPane} src={require('../../assets/images/zoom-in.png')} />
+            </div>
+          </Pane.FixedOverlay>
         </Pane>
         <Pane>
           <Grid
@@ -153,6 +192,13 @@ export class Editor extends React.Component<EditorProps, EditorState> {
             multipleSelection='alwaysKeep'
             onSelection={this.onSelectingTilesFromTileset}
           />
+          <Pane.FixedOverlay>
+            <div className={style.zoomPanel}>
+              <img onClick={this.onZoomOutTilesetPane} src={require('../../assets/images/zoom-out.png')} />
+              <img src={require('../../assets/images/zoom-glass.png')} />
+              <img onClick={this.onZoomInTilesetPane} src={require('../../assets/images/zoom-in.png')} />
+            </div>
+          </Pane.FixedOverlay>
         </Pane>
       </PanesContainer>
     );

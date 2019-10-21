@@ -15,7 +15,13 @@ export interface UploadedFile {
 }
 
 export class UploadButton extends React.Component<UploadButtonProps> {
-  private onFileSelected = (e: ChangeEvent<HTMLInputElement>) => {
+  private inputRef = React.createRef<HTMLInputElement>();
+
+  openFileDialog = () => {
+    this.inputRef.current.click();
+  }
+
+  private; onFileSelected = (e: ChangeEvent<HTMLInputElement>) => {
     const { onFileRead, readAs } = this.props;
     const { files } = e.target;
     if (files && files[0]) {
@@ -50,6 +56,7 @@ export class UploadButton extends React.Component<UploadButtonProps> {
       className={style.uploadButton}
       accept={accept.join(', ')}
       onChange={this.onFileSelected}
+      ref={this.inputRef}
     />;
   }
 }

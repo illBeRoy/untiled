@@ -1,3 +1,13 @@
 .document-area {
   flex-grow: 1;
 }
+
+.zoom-panel {
+  position: absolute;
+  right: 10px;
+  bottom: 5px;
+
+  > img {
+    cursor: pointer;
+  }
+}
