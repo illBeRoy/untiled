@@ -1,12 +1,11 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 import { saveAs } from 'file-saver';
-import { DocumentStore, EmptyDocumentCreationSpecs, Base64EncodedImage, Document } from '../../stores/document';
-import tileSet from '../../tileset.fixture';
-import style from './style.scss';
+import { DocumentStore, Document } from '../../stores/document';
 import { Editor } from '../editor/component';
 import { UploadButton } from '../upload-button/component';
 import { NewFileWizard } from '../new-file-wizard/component';
+import style from './style.scss';
 
 export interface StudioState {
   flow: 'empty' | 'new' | 'loading' | 'editing';
