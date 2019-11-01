@@ -1,9 +1,10 @@
 import React from 'react';
 import { observer } from 'mobx-react';
-import { DocumentStore, aGroupOfTiles, TileId } from '../../stores/document';
+import { DocumentStore, aGroupOfTiles, TileId, Base64EncodedImage } from '../../stores/document';
 import { Grid } from '../grid/component';
 import { PanesContainer, Pane } from '../pane/component';
 import style from './style.scss';
+import { ImportTileDialog } from '../import-tile/component';
 
 interface EditorProps {
   documentStore: DocumentStore;
@@ -157,6 +158,11 @@ export class Editor extends React.Component<EditorProps, EditorState> {
     }
   }
 
+  private onImportingTile = (tile: Base64EncodedImage) => {
+    const { documentStore } = this.props;
+    documentStore.addTile(tile);
+  }
+
   render() {
     const { mapPaneZoom, tilesetPaneZoom } = this.state;
     const { documentStore } = this.props;
@@ -164,43 +170,46 @@ export class Editor extends React.Component<EditorProps, EditorState> {
     const getImageForCellInMapDisplay = documentStore.getTileDataInPosition.bind(documentStore);
 
     return (
-      <PanesContainer className={style.documentArea} initialDistribution={[.6, .4]}>
-        <Pane>
-          <Grid
-            width={document.tileMap.width}
-            height={document.tileMap.height}
-            tileSize={document.tileSize}
-            scale={mapPaneZoom}
-            getImageForCell={getImageForCellInMapDisplay}
-            onSelection={this.onDrawingTilesOnTileMap}
-          />
-          <Pane.FixedOverlay>
-            <div className={style.zoomPanel}>
-              <img onClick={this.onZoomOutMapPane} src={require('../../assets/images/zoom-out.png')} />
-              <img src={require('../../assets/images/zoom-glass.png')} />
-              <img onClick={this.onZoomInMapPane} src={require('../../assets/images/zoom-in.png')} />
-            </div>
-          </Pane.FixedOverlay>
-        </Pane>
-        <Pane>
-          <Grid
-            width={document.tileSet.width}
-            height={document.tileSet.height}
-            tileSize={document.tileSize}
-            scale={tilesetPaneZoom}
-            getImageForCell={(x, y) => document.tileSet.tiles[y * document.tileSet.width + x]}
-            multipleSelection='alwaysKeep'
-            onSelection={this.onSelectingTilesFromTileset}
-          />
-          <Pane.FixedOverlay>
-            <div className={style.zoomPanel}>
-              <img onClick={this.onZoomOutTilesetPane} src={require('../../assets/images/zoom-out.png')} />
-              <img src={require('../../assets/images/zoom-glass.png')} />
-              <img onClick={this.onZoomInTilesetPane} src={require('../../assets/images/zoom-in.png')} />
-            </div>
-          </Pane.FixedOverlay>
-        </Pane>
-      </PanesContainer>
+      <>
+        <ImportTileDialog tileSize={document.tileSize} onTileImported={this.onImportingTile} />
+        <PanesContainer className={style.documentArea} initialDistribution={[.6, .4]}>
+          <Pane>
+            <Grid
+              width={document.tileMap.width}
+              height={document.tileMap.height}
+              tileSize={document.tileSize}
+              scale={mapPaneZoom}
+              getImageForCell={getImageForCellInMapDisplay}
+              onSelection={this.onDrawingTilesOnTileMap}
+            />
+            <Pane.FixedOverlay>
+              <div className={style.zoomPanel}>
+                <img onClick={this.onZoomOutMapPane} src={require('../../assets/images/zoom-out.png')} />
+                <img src={require('../../assets/images/zoom-glass.png')} />
+                <img onClick={this.onZoomInMapPane} src={require('../../assets/images/zoom-in.png')} />
+              </div>
+            </Pane.FixedOverlay>
+          </Pane>
+          <Pane>
+            <Grid
+              width={document.tileSet.width}
+              height={document.tileSet.height}
+              tileSize={document.tileSize}
+              scale={tilesetPaneZoom}
+              getImageForCell={(x, y) => document.tileSet.tiles[y * document.tileSet.width + x]}
+              multipleSelection='alwaysKeep'
+              onSelection={this.onSelectingTilesFromTileset}
+            />
+            <Pane.FixedOverlay>
+              <div className={style.zoomPanel}>
+                <img onClick={this.onZoomOutTilesetPane} src={require('../../assets/images/zoom-out.png')} />
+                <img src={require('../../assets/images/zoom-glass.png')} />
+                <img onClick={this.onZoomInTilesetPane} src={require('../../assets/images/zoom-in.png')} />
+              </div>
+            </Pane.FixedOverlay>
+          </Pane>
+        </PanesContainer>
+      </>
     );
   }
 }

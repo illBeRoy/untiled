@@ -2,16 +2,18 @@
   "name": "untiled",
   "version": "1.0.0-alpha3",
   "description": "super simple tilemap editor",
-  "main": "dist/index.html",
-  "directories": {
-    "test": "test"
-  },
+  "main": "electron.config.js",
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "test": "jest",
-    "start": "parcel src/index.html",
-    "start:nwjs": "parcel build src/index.html --out-dir dist --target node --no-source-maps --public-url ./ && run .",
-    "build:target:web": "TARGET=web parcel build src/index.html --out-dir dist",
-    "build:target:desktop": "TARGET=desktop parcel build src/index.html --out-dir dist --target node --no-source-maps --public-url ./ && build --tasks mac-x64 . && cp src/assets/files/** bin/untiled-1.0.0-mac-x64",
+    "start": "NODE_ENV=development concurrently -k 'npm run start:parcel' 'npm run start:electron'",
+    "start:parcel": "parcel src/index.html --target electron --out-dir dist --public-url ./",
+    "start:electron": "electron .",
+    "build": "npm run build:parcel && npm run build:electron",
+    "build:parcel": "parcel build src/index.html --out-dir dist --target electron --no-source-maps --public-url ./",
+    "build:electron": "electron-builder",
     "lint": "tslint --project tsconfig.json",
     "posttest": "npm run lint"
   },
@@ -24,15 +26,18 @@
     "@types/node": "^12.7.12",
     "@types/react": "^16.9.5",
     "@types/react-dom": "^16.9.1",
+    "concurrently": "^5.0.0",
+    "electron": "^7.0.0",
+    "electron-builder": "^22.1.0",
     "jest": "^24.9.0",
     "node-sass": "^4.12.0",
-    "nwjs-builder-phoenix": "^1.15.0",
     "parcel-bundler": "^1.12.4",
     "postcss-modules": "^1.4.1",
     "ts-jest": "^24.1.0",
     "tslint": "^5.20.0",
     "tslint-eslint-rules": "^5.4.0",
-    "typescript": "^3.6.4"
+    "typescript": "^3.6.4",
+    "watch": "^1.0.2"
   },
   "jest": {
     "transform": {
@@ -60,17 +65,11 @@
     "react": "^16.10.2",
     "react-dom": "^16.10.2"
   },
-  "window": {
-    "width": 1024,
-    "height": 768
-  },
   "build": {
-    "output": "./bin",
-    "nwVersion": "0.41.3",
-    "files": [
-      "dist/**/*",
-      "attributions.txt"
-    ],
+    "appId": "com.roysom.untiled",
+    "directories": {
+      "output": "./bin"
+    },
     "mac": {
       "icon": "src/assets/icons/map.icns"
     }

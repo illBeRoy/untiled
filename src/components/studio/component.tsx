@@ -1,6 +1,7 @@
 import React from 'react';
 import { observer } from 'mobx-react';
 import { saveAs } from 'file-saver';
+import fs from 'fs';
 import { DocumentStore, Document } from '../../stores/document';
 import { Editor } from '../editor/component';
 import { UploadButton } from '../upload-button/component';
@@ -20,6 +21,9 @@ export class Studio extends React.Component<{}, StudioState> {
   };
 
   componentDidMount() {
+    const doc = JSON.parse(fs.readFileSync('src/assets/files/example.untiled').toString());
+    this.documentStore = new DocumentStore({ fromDocument: doc });
+    this.setState({ flow: 'editing' });
     window.addEventListener('keydown', this.onKeyDown);
   }
 

@@ -117,6 +117,17 @@ export class DocumentStore {
   }
 
   @action
+  addTile(source: Base64EncodedImage) {
+    const newTilesetHeight =
+      this.document.tileSet.height === 1 || this.document.tileSet.tiles.length % this.document.tileSet.width === 0 ?
+      this.document.tileSet.height + 1 :
+      this.document.tileSet.height;
+
+    this.document.tileSet.height = newTilesetHeight;
+    this.document.tileSet.tiles.push(source);
+  }
+
+  @action
   setTileOnMapInPosition(tileId: TileId, x: number, y: number) {
     this.history.push({ [`${x},${y}`]: tileId });
   }

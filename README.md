@@ -31,18 +31,15 @@ Then install dependencies using:
 npm install
 ```
 
-You can now either run the project in your browser, using:
+You can start your project by running:
 ```bash
 npm start
 ```
 
-Or run it as standalone executable using:
-```bash
-npm run start:nwjs
-```
+This mode supports live-reload inside electron.
 
 If you want to build an executable use the following command:
 ```bash
-npm run build:target:desktop
+npm run build
 ```
-Currently it will only build to mac, but with minor modifications you'll be able to build for other platforms as well.
+It will put the executable inside the `bin` directory.
